@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SB Admin 2 - Dashboard</title>
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body id="page-top">
+    <div id="wrapper">
+
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+        </ul>
+
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+
+                <div class="container-fluid">
+                    <h1 class="h3 mb-4 text-gray-800">Dashboard</h1>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">News Articles</h6>
+                                </div>
+                                <div class="card-body">
+                                    <p>Total Articles: <span id="article-count">0</span></p>
+                                    <ul id="articles-list">
+
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <div class="card shadow mb-4">
+                                <div class="card-header py-3">
+                                    <h6 class="m-0 font-weight-bold text-primary">Line Chart</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div id="line-chart-container"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Content -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/sb-admin-2.min.js"></script>
+    <script>
+
+        fetch('savedata.json')  // Correct relative path to your JSON file
+        .then((response) => {
+            return response.json();
+        })
+        .then((data) => {
+
+            var articlesList = document.getElementById('articles-list');
+            var articleCount = document.getElementById('article-count'); // Get the article count span
+
+
+            articleCount.textContent = data.length;
+
+
+            data.forEach(item => {
+                var listItem = document.createElement('li');
+                listItem.innerHTML = `
+                    <h2>${item.title}</h2>
+                    <p>${item.paragraph}</p>
+                    <p>Date: ${item.date}</p>
+                `;
+                articlesList.appendChild(listItem);
+            });
+
+
+            var dates = data.map(item => item.date);
+            var values = data.map(item => item.paragraph.length);  // Use a suitable value for the chart
+
+
+            Highcharts.chart('line-chart-container', {
+                title: {
+                    text: 'Line Chart'
+                },
+                xAxis: {
+                    categories: dates
+                },
+                yAxis: {
+                    title: {
+                        text: 'Value'
+                    }
+                },
+                series: [{
+                    name: 'Value',
+                    data: values
+                }]
+            });
+        })
+        .catch((error) => {
+            console.error('Error loading JSON data:', error);
+        });
+    </script>
+</body>
+</html>
